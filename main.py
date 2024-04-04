@@ -50,6 +50,8 @@ train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
 val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32, shuffle=False)
 
+classes = ('Background', 'Building-flooded', 'Building-non-flooded', 'Road-flooded', 
+           'Road-non-flooded', 'Water', 'Tree', 'Vehicle', 'Pool', 'Grass')
 
 # Define the CNN Class
 class Net(nn.Module):
