@@ -139,4 +139,64 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 accuracy_values=[]
 epoch_number=[]
 
+for epoch in range(10):  # loop over the dataset multiple times. Here 10 means 10 epochs
+    running_loss = 0.0
+    
+    for i, (inputs,labels) in enumerate(train_loader, 0):
+       
+        try:
+
+        # get the inputs; data is a list of [inputs, labels]
+            if CUDA:
+                inputs = inputs.cuda()
+                labels = labels.cuda()
+            else:
+                inputs = inputs.cpu()
+                labels = labels.cpu()
+
+        # zero the parameter gradients
+            optimizer.zero_grad()
+
+        # forward + backward + optimize
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+        # print statistics
+            running_loss += loss.item()
+            if i % 2000 == 1999:    # print every 2000 mini-batches
+                print('[epoch%d, itr%5d] loss: %.3f' %
+                    (epoch + 1, i + 1, running_loss / 2000))
+                running_loss = 0.0
+        except UnidentifiedImageError:
+            print("Image Corrupt")
+
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for images, labels in test_loader:
+            if CUDA:
+              images = images.cuda()
+              labels = labels.cuda()
+            else:
+              images = images.cpu()
+              labels =labels.cpu()
+
+            outputs = net(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            if CUDA:
+              correct += (predicted.cpu()==labels.cpu()).sum().item()
+            else:
+              correct += (predicted==labels).sum().item()
+
+        TestAccuracy = 100 * correct / total;
+        epoch_number += [epoch+1]
+        accuracy_values += [TestAccuracy]
+        print('Epoch=%d Test Accuracy=%.3f' %
+                  (epoch + 1, TestAccuracy))
+
+print('Finished Training')
+
 
