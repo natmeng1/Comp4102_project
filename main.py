@@ -37,13 +37,13 @@ transform = transforms.Compose([
 ])
 
 # Define paths to the train, test, and validation folders
-#train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/train'
-#test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/test'
-#val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/val'
+train_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/train'
+test_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/test'
+val_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/val'
 
-train_path = 'FloodNet-Supervised_v1.0/train'
-test_path = 'FloodNet-Supervised_v1.0/test'
-val_path = 'FloodNet-Supervised_v1.0/val'
+#train_path = 'FloodNet-Supervised_v1.0/train'
+#test_path = 'FloodNet-Supervised_v1.0/test'
+#val_path = 'FloodNet-Supervised_v1.0/val'
 
 train_dataset = ImageFolder(root=train_path, transform=transform)
 test_dataset = ImageFolder(root=test_path , transform=transform)
@@ -139,7 +139,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 accuracy_values=[]
 epoch_number=[]
 
-for epoch in range(10):  # loop over the dataset multiple times. Here 10 means 10 epochs
+for epoch in range(30):  # loop over the dataset multiple times. Here 10 means 10 epochs
     running_loss = 0.0
     
     for i, (inputs,labels) in enumerate(train_loader, 0):
