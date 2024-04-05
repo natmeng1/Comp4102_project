@@ -41,9 +41,9 @@ transform = transforms.Compose([
 #test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/test'
 #val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/val'
 
-train_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/train'
-test_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/test'
-val_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/val'
+train_path = 'FloodNet-Supervised_v1.0/train'
+test_path = 'FloodNet-Supervised_v1.0/test'
+val_path = 'FloodNet-Supervised_v1.0/val'
 
 train_dataset = ImageFolder(root=train_path, transform=transform)
 test_dataset = ImageFolder(root=test_path , transform=transform)
