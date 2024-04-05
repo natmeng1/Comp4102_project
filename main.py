@@ -37,9 +37,9 @@ transform = transforms.Compose([
 ])
 
 # Define paths to the train, test, and validation folders
-train_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/train'
-test_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/test'
-val_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/val'
+train_path = '~/Downloads/FloodNet-Supervised_v1-2.0/train'
+test_path = '~/Downloads/FloodNet-Supervised_v1-2.0/test'
+val_path = '~/Downloads/FloodNet-Supervised_v1-2.0/val'
 
 #train_path = 'FloodNet-Supervised_v1.0/train'
 #test_path = 'FloodNet-Supervised_v1.0/test'
@@ -139,7 +139,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 accuracy_values=[]
 epoch_number=[]
 
-for epoch in range(30):  # loop over the dataset multiple times. Here 10 means 10 epochs
+for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10 epochs
     running_loss = 0.0
     
     for i, (inputs,labels) in enumerate(train_loader, 0):
@@ -198,5 +198,34 @@ for epoch in range(30):  # loop over the dataset multiple times. Here 10 means 1
                   (epoch + 1, TestAccuracy))
 
 print('Finished Training')
+
+
+class_correct = list(0. for i in range(10))
+class_total = list(0. for i in range(10))
+with torch.no_grad():
+    for images, labels in test_loader:
+        if CUDA:
+          images =images.cuda()
+          labels =labels.cuda()
+        else:
+          images =images.cpu()
+          labels =labels.cpu()
+
+        outputs = net(images)
+        _, predicted = torch.max(outputs, 1)
+        c = (predicted == labels).squeeze()
+        for i in range(4):
+            label = labels[i]
+            class_correct[label] += c[i].item()
+            class_total[label] += 1
+
+
+for i in range(10):
+    if(class_total[i] != 0):
+        print('Accuracy of %5s : %2d %%' % (
+            classes[i], 100 * class_correct[i] / class_total[i]))
+    else:
+        print('Accuracy of %5s : %2d %%' % (
+            classes[i], 0 ))
 
 
