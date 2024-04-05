@@ -6,10 +6,11 @@ import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
 import torch
 from PIL import Image
+import torch.optim as optim
+from PIL import UnidentifiedImageError
 
 
-
-#URL = 'https://drive.google.com/drive/folders/1leN9eWVQcvWDVYwNb2GCo5ML_wBEycWD?usp=share_link'
+ #URL = 'https://drive.google.com/drive/folders/1leN9eWVQcvWDVYwNb2GCo5ML_wBEycWD?usp=share_link'
 #download_folder(URL)
 
 class CustomDataset(torch.utils.data.Dataset):
@@ -37,9 +38,13 @@ transform = transforms.Compose([
 ])
 
 # Define paths to the train, test, and validation folders
-train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/train'
-test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/test'
-val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/val'
+#train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/train'
+#test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/test'
+#val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1.0/val'
+
+train_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/train'
+test_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/test'
+val_path = '~/Comp4102_project/FloodNet-Supervised_v1.0/val'
 
 train_dataset = ImageFolder(root=train_path, transform=transform)
 test_dataset = ImageFolder(root=test_path , transform=transform)
@@ -116,3 +121,23 @@ class Net(nn.Module):
         #   - Return output
         return x
 print(Net())
+
+
+net=Net()
+
+CUDA=torch.cuda.is_available()
+if CUDA:
+  net=net.cuda()
+
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+print(device)
+
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+accuracy_values=[]
+epoch_number=[]
+
+
