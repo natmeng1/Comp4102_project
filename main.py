@@ -7,28 +7,44 @@ import torch
 from PIL import Image
 import torch.optim as optim
 from PIL import UnidentifiedImageError
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
+import os
+
 
 
  #URL = 'https://drive.google.com/drive/folders/1leN9eWVQcvWDVYwNb2GCo5ML_wBEycWD?usp=share_link'
 #download_folder(URL)
 
-class CustomDataset(torch.utils.data.Dataset):
-    def __init__(self, root, transform=None):
-        self.root = root
-        self.transform = transform
 
-        self.originals = ImageFolder(root=root + '/org-img', transform=transform)
-        self.labels = ImageFolder(root=root + '/label-img', transform=transform)
+class CustomDataSet(Dataset):
+    def __init__(self, root_dir, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.org_dir=os.path.join(root_dir,'org-img')
+        self.label_dir=os.path.join(root_dir,'label-img')
+        self.org_images = os.listdir(self.org_dir)       
+        self.label_images = os.listdir(self.label_dir)
+
 
     def __len__(self):
-        return len(self.originals)
+        return min(len(self.org_images), len(self.label_images))
 
     def __getitem__(self, idx):
-        original_img, _ = self.originals[idx]
-        label_img, _ = self.labels[idx]
+        original_img_name = self.org_images[idx]
+        label_img_name = self.label_images[idx]
 
-        return original_img, label_img
+        org_img_path = os.path.join(self.org_dir, original_img_name)
+        label_img_path = os.path.join(self.label_dir,label_img_name)
 
+        original_image = Image.open(org_img_path).convert("RGB")
+        label_image = Image.open(label_img_path).convert("RGB")
+
+        if self.transform:
+            original_image = self.transform(original_image)
+            label_image = self.transform(label_image)
+        return original_image, label_image
+    
 # Define transformations for preprocessing
 transform = transforms.Compose([
     transforms.Resize((32, 32)),  # Resize images to 32x32
@@ -37,23 +53,19 @@ transform = transforms.Compose([
 ])
 
 # Define paths to the train, test, and validation folders
-train_path = '~/Downloads/FloodNet-Supervised_v1-2.0/train'
-test_path = '~/Downloads/FloodNet-Supervised_v1-2.0/test'
-val_path = '~/Downloads/FloodNet-Supervised_v1-2.0/val'
+train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/train'
+test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/test'
+val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/val'
 
-#train_path = 'FloodNet-Supervised_v1.0/train'
-#test_path = 'FloodNet-Supervised_v1.0/test'
-#val_path = 'FloodNet-Supervised_v1.0/val'
 
-train_dataset = ImageFolder(root=train_path, transform=transform)
-test_dataset = ImageFolder(root=test_path , transform=transform)
-val_dataset = ImageFolder(root=val_path , transform=transform)
+train_dataset = CustomDataSet(root_dir=train_path, transform=transform)
+test_dataset = CustomDataSet(root_dir=test_path , transform=transform)
+val_dataset = CustomDataSet(root_dir=val_path , transform=transform)
 
 # Create data loaders
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
-val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32, shuffle=False)
-
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False)
 classes = ('Background', 'Building-flooded', 'Building-non-flooded', 'Road-flooded', 
            'Road-non-flooded', 'Water', 'Tree', 'Vehicle', 'Pool', 'Grass')
 
@@ -158,6 +170,8 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
             optimizer.zero_grad()
 
         # forward + backward + optimize
+            print("inputs: ",inputs)
+            print("labels: ", labels)
             outputs = net(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
