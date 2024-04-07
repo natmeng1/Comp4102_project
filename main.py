@@ -63,9 +63,9 @@ test_dataset = CustomDataSet(root_dir=test_path , transform=transform)
 val_dataset = CustomDataSet(root_dir=val_path , transform=transform)
 
 # Create data loaders
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False)
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=12, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=12, shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=12, shuffle=False)
 classes = ('Background', 'Building-flooded', 'Building-non-flooded', 'Road-flooded', 
            'Road-non-flooded', 'Water', 'Tree', 'Vehicle', 'Pool', 'Grass')
 
@@ -118,6 +118,7 @@ class Net(nn.Module):
         
         #x = x.view(-1, 2304)
         x = x.view(x.size(0), -1)
+        print("x: ",len(x))
         #   - Apply fc1, followed by ReLU activation
         #x = F.sigmoid(self.fc1(x))
         x = F.relu(self.fc1(x))
@@ -165,14 +166,21 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
             else:
                 inputs = inputs.cpu()
                 labels = labels.cpu()
-
+            
         # zero the parameter gradients
             optimizer.zero_grad()
 
+            
         # forward + backward + optimize
-            print("inputs: ",inputs)
-            print("labels: ", labels)
+            print("inputs: ",len(inputs))
+            print("labels: ", len(labels))
             outputs = net(inputs)
+            print("output: ", len(outputs))
+            outputs = outputs.view(-1,10)  # Assuming len(classes) is the number of classes
+            labels = labels.view(-1)
+            print("inputs: ",len(inputs))
+            print("labels: ", len(labels))
+            
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
