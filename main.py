@@ -186,30 +186,23 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
 
             
         # forward + backward + optimize
-            print("inputs: ",inputs.size())
+            #print("inputs: ",inputs.size())
             #should be:4,3,32,32
             #is:4,3,32,32
-            labels =labels.view(labels.size(0), -1)
+            #print("labels b4: ", labels.size())
             
-            print("labels b4: ", labels.size())
-             #should be:4,10
-            #is:4,3072
+            _, predicted_labels = torch.max(outputs, dim=1)
+            ##print("labels after: ", predicted_labels.size())
+            #should be:4,
+            #is:4,
 
             outputs = net(inputs)
-            print(outputs)
-            print("outputs: ", outputs.size())
+            #print(outputs)
+            #print("outputs: ", outputs.size())
              #should be:4,10
             #is:4,10
-            #print("output: ", len(outputs))
-
-
-            #target = torch.tensor(class_names)
-            #print("class: ", target)
-            #print("size: ", target.size())
-           # outputs = outputs.view(-1,10)  # Assuming len(classes) is the number of classes
-           # print(labels.size())
-            
-            loss = criterion(outputs, labels)
+        
+            loss = criterion(outputs, predicted_labels)
             loss.backward()
             optimizer.step()
 
