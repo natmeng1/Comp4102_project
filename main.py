@@ -10,6 +10,8 @@ from PIL import UnidentifiedImageError
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import os
+import torch
+
 
 
 
@@ -47,9 +49,9 @@ class CustomDataSet(Dataset):
     
 # Define transformations for preprocessing
 transform = transforms.Compose([
-    transforms.Resize((32, 32)),  # Resize images to 32x32
+    transforms.Resize((32, 32)),  
     transforms.ToTensor(),         # Convert images to PyTorch tensors
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))  # Normalize pixel values
+    #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))  # Normalize pixel values
 ])
 
 # Define paths to the train, test, and validation folders
@@ -63,11 +65,23 @@ test_dataset = CustomDataSet(root_dir=test_path , transform=transform)
 val_dataset = CustomDataSet(root_dir=val_path , transform=transform)
 
 # Create data loaders
-train_loader = DataLoader(train_dataset, batch_size=12, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=12, shuffle=False)
-val_loader = DataLoader(val_dataset, batch_size=12, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False)
 classes = ('Background', 'Building-flooded', 'Building-non-flooded', 'Road-flooded', 
            'Road-non-flooded', 'Water', 'Tree', 'Vehicle', 'Pool', 'Grass')
+class_names = {
+    'Background': 0,
+    'Building-flooded': 1,
+    'Building-non-flooded': 2,
+    'Road-flooded': 3,
+    'Road-non-flooded': 4,
+    'Water': 5,
+    'Tree': 6,
+    'Vehicle': 7,
+    'Pool': 8,
+    'Grass': 9
+}
 
 # Define the CNN Class
 class Net(nn.Module):
@@ -95,7 +109,7 @@ class Net(nn.Module):
         #   - Input features: 16 * 5 * 5
         #   - Output features: 120
         self.fc1= nn.Linear(16 * 5 * 5, 120)
-        #self.fc1= nn.Linear(16 * 5 * 5, 120)
+        #self.fc1= nn.Linear(490000, 120)
         # Step 5: Create the second fully connected layer (fc2)
         #   - Input features: 120
         #   - Output features: 120
@@ -118,7 +132,7 @@ class Net(nn.Module):
         
         #x = x.view(-1, 2304)
         x = x.view(x.size(0), -1)
-        print("x: ",len(x))
+        #print("x: ",len(x))
         #   - Apply fc1, followed by ReLU activation
         #x = F.sigmoid(self.fc1(x))
         x = F.relu(self.fc1(x))
@@ -172,14 +186,28 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
 
             
         # forward + backward + optimize
-            print("inputs: ",len(inputs))
-            print("labels: ", len(labels))
+            print("inputs: ",inputs.size())
+            #should be:4,3,32,32
+            #is:4,3,32,32
+            labels =labels.view(labels.size(0), -1)
+            
+            print("labels b4: ", labels.size())
+             #should be:4,10
+            #is:4,3072
+
             outputs = net(inputs)
-            print("output: ", len(outputs))
-            outputs = outputs.view(-1,10)  # Assuming len(classes) is the number of classes
-            labels = labels.view(-1)
-            print("inputs: ",len(inputs))
-            print("labels: ", len(labels))
+            print(outputs)
+            print("outputs: ", outputs.size())
+             #should be:4,10
+            #is:4,10
+            #print("output: ", len(outputs))
+
+
+            #target = torch.tensor(class_names)
+            #print("class: ", target)
+            #print("size: ", target.size())
+           # outputs = outputs.view(-1,10)  # Assuming len(classes) is the number of classes
+           # print(labels.size())
             
             loss = criterion(outputs, labels)
             loss.backward()
