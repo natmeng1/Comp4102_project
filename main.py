@@ -13,9 +13,7 @@ import os
 import torch
 
 
-
-
- #URL = 'https://drive.google.com/drive/folders/1leN9eWVQcvWDVYwNb2GCo5ML_wBEycWD?usp=share_link'
+#URL = 'https://drive.google.com/drive/folders/1leN9eWVQcvWDVYwNb2GCo5ML_wBEycWD?usp=share_link'
 #download_folder(URL)
 
 
@@ -25,9 +23,32 @@ class CustomDataSet(Dataset):
         self.transform = transform
         self.org_dir=os.path.join(root_dir,'org-img')
         self.label_dir=os.path.join(root_dir,'label-img')
-        self.org_images = os.listdir(self.org_dir)       
-        self.label_images = os.listdir(self.label_dir)
+        
+        init_org_images = os.listdir(self.org_dir)       
+        init_label_images = os.listdir(self.label_dir)
 
+        self.org_images = []
+        self.label_images = []
+
+        
+
+        for image in init_org_images:
+            try:
+                im = Image.open(os.path.join(self.org_dir, image))
+                self.org_images.append(image)
+            except IOError:
+                continue
+
+        for image in init_label_images:
+            try:
+                im = Image.open(os.path.join(self.label_dir, image))
+                self.label_images.append(image)
+            except IOError:
+                continue
+
+        print(f"# of Org Images: {len(self.org_images)}")
+        print(f"# of Label Images: {len(self.label_images)}")
+        
 
     def __len__(self):
         return min(len(self.org_images), len(self.label_images))
@@ -55,9 +76,13 @@ transform = transforms.Compose([
 ])
 
 # Define paths to the train, test, and validation folders
-train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/train'
-test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/test'
-val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/val'
+train_path = '/FloodNet-Supervised_v1.0/train'
+test_path = '/FloodNet-Supervised_v1.0/test'
+val_path = '/FloodNet-Supervised_v1.0/val'
+
+train_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1.0/train'
+test_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1.0/test'
+val_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1.0/val'
 
 #train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/train'
 #test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/test'
@@ -73,6 +98,7 @@ val_dataset = CustomDataSet(root_dir=val_path , transform=transform)
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True,drop_last=True)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False,drop_last=True)
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False,drop_last=True)
+
 classes = ('Background', 'Building-flooded', 'Building-non-flooded', 'Road-flooded', 
            'Road-non-flooded', 'Water', 'Tree', 'Vehicle', 'Pool', 'Grass')
 class_names = {
@@ -194,14 +220,13 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
             #print("inputs: ",inputs.size())
             #should be:4,3,32,32
             #is:4,3,32,32
-            print("labels b4: ", labels.size())
-            print("out: ", outputs.size())
-            _, predicted_labels = torch.max(outputs, dim=1)
-            print("labels after: ", predicted_labels.size())
+
             #should be:4,
             #is:4,
 
             outputs = net(inputs)
+            _, predicted_labels = torch.max(outputs, dim=1)
+            
             #print(outputs)
             #print("outputs: ", outputs.size())
              #should be:4,10
