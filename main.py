@@ -59,6 +59,11 @@ train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/train'
 test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/test'
 val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-2.0/val'
 
+#train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/train'
+#test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/test'
+#val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/val'
+
+
 
 train_dataset = CustomDataSet(root_dir=train_path, transform=transform)
 test_dataset = CustomDataSet(root_dir=test_path , transform=transform)
@@ -229,13 +234,13 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
             outputs = net(images)
             _, predicted = torch.max(outputs, dim=1)
             total += labels.size(0)
-            print("AFTER CPMP label: ", labels.size())
-            print("AFTER CMP PREDICTED: ", predicted.size())
+           # print("AFTER CPMP label: ", labels.size())
+            #print("AFTER CMP PREDICTED: ", predicted.size())
             if CUDA:
-              print("Here")
+             # print("Here")
               correct += (predicted.cpu()==labels.cpu()).sum().item()
             else:
-              print("Else")
+             # print("Else")
               correct += (predicted==labels).sum().item()
 
         TestAccuracy = 100 * correct / total;
@@ -261,8 +266,10 @@ with torch.no_grad():
         outputs = net(images)
         _, predicted = torch.max(outputs, 1)
         c = (predicted == labels).squeeze()
-        for i in range(4):
+        for i in range(32):
             label = labels[i]
+            _, label_flat = torch.max(label, 1)
+            print("LABELL: ", label)
             class_correct[label] += c[i].item()
             class_total[label] += 1
 
