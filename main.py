@@ -13,8 +13,18 @@ import os
 import torch
 
 
-#URL = 'https://drive.google.com/drive/folders/1leN9eWVQcvWDVYwNb2GCo5ML_wBEycWD?usp=share_link'
-#download_folder(URL)
+# Define paths to the train, test, and validation folders
+# train_path = '/FloodNet-Supervised_v1.0/train'
+# test_path = '/FloodNet-Supervised_v1.0/test'
+# val_path = '/FloodNet-Supervised_v1.0/val'
+
+train_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/train'
+test_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/test'
+# val_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/val'
+
+#train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/train'
+#test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/test'
+#val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/val'
 
 
 class CustomDataSet(Dataset):
@@ -30,7 +40,6 @@ class CustomDataSet(Dataset):
         self.org_images = []
         self.label_images = []
 
-        
 
         for image in init_org_images:
             try:
@@ -75,29 +84,16 @@ transform = transforms.Compose([
     #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))  # Normalize pixel values
 ])
 
-# Define paths to the train, test, and validation folders
-train_path = '/FloodNet-Supervised_v1.0/train'
-test_path = '/FloodNet-Supervised_v1.0/test'
-val_path = '/FloodNet-Supervised_v1.0/val'
-
-train_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1.0/train'
-test_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1.0/test'
-val_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1.0/val'
-
-#train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/train'
-#test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/test'
-#val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/val'
-
 
 
 train_dataset = CustomDataSet(root_dir=train_path, transform=transform)
 test_dataset = CustomDataSet(root_dir=test_path , transform=transform)
-val_dataset = CustomDataSet(root_dir=val_path , transform=transform)
+# val_dataset = CustomDataSet(root_dir=val_path , transform=transform)
 
 # Create data loaders
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True,drop_last=True)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False,drop_last=True)
-val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False,drop_last=True)
+# val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False,drop_last=True)
 
 classes = ('Background', 'Building-flooded', 'Building-non-flooded', 'Road-flooded', 
            'Road-non-flooded', 'Water', 'Tree', 'Vehicle', 'Pool', 'Grass')
@@ -226,7 +222,7 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
 
             outputs = net(inputs)
             _, predicted_labels = torch.max(outputs, dim=1)
-            
+
             #print(outputs)
             #print("outputs: ", outputs.size())
              #should be:4,10
