@@ -65,9 +65,9 @@ test_dataset = CustomDataSet(root_dir=test_path , transform=transform)
 val_dataset = CustomDataSet(root_dir=val_path , transform=transform)
 
 # Create data loaders
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False)
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True,drop_last=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False,drop_last=True)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False,drop_last=True)
 classes = ('Background', 'Building-flooded', 'Building-non-flooded', 'Road-flooded', 
            'Road-non-flooded', 'Water', 'Tree', 'Vehicle', 'Pool', 'Grass')
 class_names = {
@@ -189,10 +189,10 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
             #print("inputs: ",inputs.size())
             #should be:4,3,32,32
             #is:4,3,32,32
-            #print("labels b4: ", labels.size())
-            
+            print("labels b4: ", labels.size())
+            print("out: ", outputs.size())
             _, predicted_labels = torch.max(outputs, dim=1)
-            ##print("labels after: ", predicted_labels.size())
+            print("labels after: ", predicted_labels.size())
             #should be:4,
             #is:4,
 
@@ -227,11 +227,15 @@ for epoch in range(3):  # loop over the dataset multiple times. Here 10 means 10
               labels =labels.cpu()
 
             outputs = net(images)
-            _, predicted = torch.max(outputs.data, 1)
+            _, predicted = torch.max(outputs, dim=1)
             total += labels.size(0)
+            print("AFTER CPMP label: ", labels.size())
+            print("AFTER CMP PREDICTED: ", predicted.size())
             if CUDA:
+              print("Here")
               correct += (predicted.cpu()==labels.cpu()).sum().item()
             else:
+              print("Else")
               correct += (predicted==labels).sum().item()
 
         TestAccuracy = 100 * correct / total;
