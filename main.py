@@ -19,6 +19,10 @@ from models import VGG16_model
 from image_dataset import ImageDataSet
 from keras.utils import to_categorical
 
+import random
+import torchvision
+import tensorflow as tf
+import matplotlib.pyplot as plt
 
 # Define paths to the train, test, and validation folders
 # train_path = '/FloodNet-Supervised_v1.0/train'
@@ -93,3 +97,46 @@ vgg_model.fit(
     epochs = 100,
     validation_data=(test_images,test_labels_one_hot)
 )
+
+random_indices = random.sample(range(len(test_dataset)), 4)
+sample_images = []
+sample_labels = []
+for idx in random_indices:
+    image, label = test_dataset[idx]
+    sample_images.append(image)
+    sample_labels.append(label)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+sample_images = torch.stack(sample_images) 
+sample_images = sample_images.to(device)    
+sample_labels = torch.tensor(sample_labels).to(device)
+
+sample_images = torch.transpose(sample_images, 1, 3)
+
+with torch.no_grad():
+    cnn_predictions = model(sample_images)
+    vgg_predictions = vgg_model(sample_images)
+
+cnn_predicted_labels = tf.argmax(cnn_predictions, axis=1).numpy()
+vgg_predicted_labels = tf.argmax(vgg_predictions, axis=1).numpy()
+
+def display_images(images, predicted_labels, actual_labels, class_names):
+    fig, axs = plt.subplots(1, len(images), figsize=(12, 4))
+    for i, ax in enumerate(axs):
+        
+        image = images[i]
+        if len(image.shape) == 3 and image.shape[0] in [1, 3]:
+            image = image.permute(1, 2, 0)
+        ax.imshow(image)
+        ax.axis('off')
+       
+
+
+display_images(sample_images, cnn_predicted_labels, sample_labels, class_names)
+plt.show()
+
+
+for i in range(4):
+    print(f"Image {i+1}:")
+    print(f"   CNN Predicted Label: {cnn_predicted_labels[i]}, Actual Label: {sample_labels[i]}")
+    print(f"   VGG Predicted Label: {vgg_predicted_labels[i]}, Actual Label: {sample_labels[i]}")
