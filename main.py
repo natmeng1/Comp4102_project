@@ -11,11 +11,13 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import os
 import torch
-import keras
+
 import numpy as np
 from models import CNN_model
+from models import VGG16_model
 
 from image_dataset import ImageDataSet
+from keras.utils import to_categorical
 
 
 # Define paths to the train, test, and validation folders
@@ -23,12 +25,12 @@ from image_dataset import ImageDataSet
 # test_path = '/FloodNet-Supervised_v1.0/test'
 # val_path = '/FloodNet-Supervised_v1.0/val'
 
-train_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/train'
-test_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/test'
+#train_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/train'
+#test_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/test'
 # val_path = '/Users/jovinbains/Desktop/Computer Vision Project/Comp4102_project/FloodNet-Supervised_v1-3.0/val'
 
-#train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/train'
-#test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/test'
+train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3-2.0/train'
+test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3-2.0/test'
 #val_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3.0/val'
 
 
@@ -59,6 +61,11 @@ test_dataset = ImageDataSet(root_dir=test_path, class_number=class_names['Pool']
 
 # Define the CNN Class
 model = CNN_model()
+# Define the ResNet Class
+input_shape = (32, 32, 3)
+vgg_model = VGG16_model(input_shape)
+vgg_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
 
 train_images = np.array([np.array(img) for img, _ in train_dataset])
 train_labels = np.array([np.array(label) for _, label in train_dataset])
@@ -76,4 +83,13 @@ model.fit(
     validation_data=(test_images, test_labels)
 )
 
+train_labels_one_hot = to_categorical(train_labels, num_classes=10)
+test_labels_one_hot = to_categorical(test_labels, num_classes=10)
 
+
+vgg_model.fit(
+    train_images,
+    train_labels_one_hot,
+    epochs = 100,
+    validation_data=(test_images,test_labels_one_hot)
+)
