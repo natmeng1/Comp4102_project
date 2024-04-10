@@ -1,0 +1,29 @@
+README
+
+In order to successfuly run our code, the following steps must be done.
+
+1:Download the zip submission file provided
+2:After unzipping the file, the following files should be included:
+    main.py
+    models.py
+    image_dataset.py
+    README.txt
+    Dataset, with the naming convention FloodNet-Supervised_v...
+    Video going over our project
+    Final report pdf
+*If any of these files are missing, please contact one of our group members
+3:in main.py, replace the following lines with the path to the downloaded dataset you recieved in step 2. 
+
+train_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3-2.0/train'
+test_path = '/Users/natmengistu/Downloads/FloodNet-Supervised_v1-3-2.0/test
+
+*Ensure that the train variable contains the path to the train subfolder, and the test variable containing the path
+to the test sub-folder
+
+4:Ensure all libraries used are installed.
+
+5:If you are running Python 3.12 or later, you must append all of the code from image_dataset.py, and models.py to 
+main.py, as we have found that there are some now-abolished libraries that require all the code to be in one
+file in order to run. If you are using Python 3.11 or earlier, there should not be an issue
+
+6:the code should now be ready to test.
